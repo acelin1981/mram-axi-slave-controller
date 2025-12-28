@@ -12,6 +12,33 @@ The materials in this repository are intended for public reference, technical
 explanation, and design documentation. All files are published to provide a
 verifiable, timestamped public record of the work.
 
+RTL Structure
+-------------
+The design is organized into the following key components:
+
+- `mcu_axi_master_model.sv`  
+  Behavioral AXI master modeling basic MCU-style read/write traffic.
+
+- `dma_axi_master_model.sv`  
+  Behavioral AXI master modeling DMA-style memory access.
+
+- `axi_noc_2m2s.sv`  
+  AXI interconnect providing arbitration and address decoding between masters
+  and slave subsystems.
+
+- `axi_mram_slave.sv`  
+  AXI slave controller interfacing with the MRAM model.
+
+- `mram_model.sv`  
+  Behavioral MRAM macro model used for functional simulation.
+
+- `axi_ram_slave_model.sv`  
+  Simple SRAM-backed AXI slave model.
+
+- `soc_top_2m2s_noc_mram.sv`  
+  Top-level SoC integration connecting all masters, interconnect, and slaves.
+
+
 Repository Contents
 -------------------
 
