@@ -1,95 +1,96 @@
-Technical Article:  
-==================
+# AMBA-Compatible MRAM AXI Slave Controller (SystemVerilog)
+
+## Technical Article:
 Designing an AMBA-Compatible MRAM AXI Slave Controller for Modern SoCs  
 https://medium.com/@ace.lin0121/designing-an-amba-compatible-mram-axi-slave-controller-for-modern-socs-3cade20bce41
 
-MRAM AXI Slave Controller
-=========================
+---
 
-This repository provides documentation and a reference SystemVerilog implementation
-related to an MRAM-based AXI slave controller and its role in SoC-level architecture.
+## Overview
+This repository contains a SystemVerilog implementation of an AMBA AXI-compatible MRAM slave controller and related SoC-level models used for functional validation and power/energy analysis in simulation.
 
-The materials in this repository are intended for public reference, technical
-explanation, and design documentation. All files are published to provide a
-verifiable, timestamped public record of the work.
+The project includes:
+- AXI NoC (2 masters / 3 slaves) integration example
+- MRAM controller + MRAM behavioral model
+- DDR4 / SRAM / generic RAM slave models
+- System-level memory power monitor
+- Testbench for frame-based workload simulation (plusargs configurable)
 
-RTL Structure
--------------
-The design is organized into the following key components:
+---
 
-- `mcu_axi_master_model.sv`  
-  Behavioral AXI master modeling basic MCU-style read/write traffic.
+## Repository Structure
+```text
+.
+├── src/                 # RTL modules (SystemVerilog)
+│   ├── design_preamble.sv
+│   ├── axi_noc_2m3s.sv
+│   ├── axi_mram_slave_ctrl.sv
+│   ├── mram_model.sv
+│   ├── axi_ddr4_slave_model.sv
+│   ├── axi_sram_slave_model.sv
+│   ├── axi_ram_slave_model.sv
+│   ├── soc_mem_power_monitor.sv
+│   └── npu_trace_axi_master_no_reuse.sv
+├── tb/                  # Testbench
+│   └── testbench_acelin1981.sv
+├── rtl.f                # Icarus Verilog filelist
+├── run.bat              # One-click compile + run on Windows
+└── README.md
+```
 
-- `dma_axi_master_model.sv`  
-  Behavioral AXI master modeling DMA-style memory access.
+---
 
-- `axi_noc_2m2s.sv`  
-  AXI interconnect providing arbitration and address decoding between masters
-  and slave subsystems.
+## Quick Start (Windows + Icarus Verilog)
 
-- `axi_mram_slave.sv`  
-  AXI slave controller interfacing with the MRAM model.
+### Prerequisites
+Install **Icarus Verilog** (`iverilog` and `vvp` available in PATH).
 
-- `mram_model.sv`  
-  Behavioral MRAM macro model used for functional simulation.
+Verify in PowerShell:
+```powershell
+iverilog -V
+vvp -V
+```
 
-- `axi_ram_slave_model.sv`  
-  Simple SRAM-backed AXI slave model.
+### Build & Run
+In the project root directory:
+```powershell
+.\run.bat 100
+```
 
-- `soc_top_2m2s_noc_mram.sv`  
-  Top-level SoC integration connecting all masters, interconnect, and slaves.
+---
 
+## Simulation Parameters (Plusargs)
+The testbench accepts runtime plusargs via `vvp`.
 
-Repository Contents
--------------------
+`WEIGHT_MRAM_PCT` options:
+**0, 20, 40, 60, 80, 100**
 
-axi_mram_slave.sv  
-A reference SystemVerilog module illustrating the structure of an AXI slave
-interface for an MRAM-based memory component. This file shows example read and
-write paths, address handling, and a conceptual MRAM-side request flow.  
-This RTL is provided for documentation and educational purposes.
+Examples:
+```powershell
+.\run.bat 0
+.\run.bat 60
+.\run.bat 100
+```
 
-MRAM based AI SOC architecture.docx  
-A document describing a high-level SoC architecture that integrates MRAM within
-an AI-oriented system. It discusses design considerations, memory roles, and
-how MRAM can be placed within an SoC memory hierarchy.
+Default arguments used in `run.bat`:
+- `+SCALE=256`
+- `+WEIGHT_MODE=C`
+- `+WEIGHT_MRAM_PCT=<0|20|40|60|80|100>`
 
-What is MRAM and Why It Matters in SoC Design.docx  
-A technical note providing an overview of MRAM fundamentals and its relevance to
-modern SoC design, including endurance, retention characteristics, and possible
-usage scenarios.
+---
 
-README.md  
-This file.
+## Notes
+- `design_preamble.sv` is included by RTL modules using:
+  ```sv
+  `include "design_preamble.sv"
+  ```
+  Therefore the compile command uses `+incdir+./src`.
 
-Purpose
--------
+- If you add new RTL files under `src/`, remember to update `rtl.f`.
 
-The purpose of this repository is to publish publicly accessible MRAM-related
-design documentation and example RTL for reference. All materials reflect design
-concepts and explanations for learning, architectural discussion, and design
-traceability.
+---
 
-Current Status
---------------
-
-This repository includes documentation and a conceptual RTL reference module.
-It does not include verification environments, testbenches, or synthesis-ready
-integrated components.
-
-Planned Additions
------------------
-
-Possible future updates may include:
-- Additional explanatory notes or diagrams
-- Minor refinements to documentation structure
-
-Versioning
-----------
-
-v1.0.0 – Initial public release (documentation, reference AXI MRAM Slave and example MRAM-Based SOC RTL)
-
-Contact
--------
-
-For questions or clarifications, please open an Issue on GitHub.
+## License
+Copyright (c) acelin1981  
+Academic/Research use is permitted (non-commercial) with attribution.  
+Commercial use requires prior written permission from the copyright holder.
